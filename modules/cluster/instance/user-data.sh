@@ -1,6 +1,12 @@
 #!/bin/bash
 sudo yum -y update
+sudo yum -y install httpd
 sudo yum -y install jq
+myip=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
+echo "<h2>WebServer with private IP: $myip</h2><p>Build by Terraform using External Script!!!" > /var/www/html/index.html
+sudo service httpd start
+chkconfig httpd on
+
 mkdir ~/downloads
 wget -O ~/downloads/terraform.zip https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
 wget -O ~/downloads/atlantis.zip https://github.com/runatlantis/atlantis/releases/download/v0.12.0/atlantis_linux_386.zip
@@ -28,10 +34,9 @@ echo "{
     \"content_type\": \"json\",
     \"insecure_ssl\": \"0\",
     \"secret\": \"$SECRET\",
-    \"url\": \"$URL\"
+    \"url\": \"http://$URL\"
   }
-}"
- > data.json
+}"  > data.json
 
 curl -X POST \
 -u $USERNAME:$TOKEN \
@@ -43,7 +48,7 @@ sudo yum -y clean all
 sudo rm -rf /var/cache/yum
 
 atlantis server \
---atlantis-url="$URL" \
+--atlantis-url="http://$URL" \
 --gh-user="$USERNAME" \
 --gh-token="$TOKEN" \
 --gh-webhook-secret="$SECRET" \
