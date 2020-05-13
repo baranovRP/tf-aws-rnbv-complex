@@ -76,6 +76,16 @@ resource "aws_security_group_rule" "allow_ssh_instance" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "allow_atlantis_instance" {
+  type              = "ingress"
+  security_group_id = aws_security_group.web_dmz.id
+
+  from_port   = 4141
+  to_port     = 4141
+  protocol    = -1
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
 resource "aws_security_group_rule" "allow_all_outbound_instance" {
   type              = "egress"
   security_group_id = aws_security_group.web_dmz.id
