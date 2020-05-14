@@ -15,6 +15,7 @@ sudo unzip ~/downloads/terraform.zip -d /usr/local/bin/
 sudo unzip ~/downloads/atlantis.zip -d /usr/local/bin/
 rm -rf ~/downloads/
 
+export AWS_PROFILE=ora2postgres
 export URL_ALB=${alb_dns_name}/events
 export URL=$URL_ALB
 export USERNAME=$(aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .username)
