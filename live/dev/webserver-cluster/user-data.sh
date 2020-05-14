@@ -14,7 +14,7 @@ sudo unzip ~/downloads/terraform.zip -d /usr/local/bin/
 sudo unzip ~/downloads/atlantis.zip -d /usr/local/bin/
 rm -rf ~/downloads/
 
-export URL_ALB=$HOSTNAME/events
+export URL_ALB=${alb_dns_name}/events
 export URL=$URL_ALB
 export USERNAME=$(aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .username)
 export TOKEN=$(aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .token)
