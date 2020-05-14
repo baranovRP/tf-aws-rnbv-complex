@@ -41,11 +41,6 @@ variable "image_id" {
   default     = ""
 }
 
-variable "target_group_web_arn" {
-  description = "The target for web traffic"
-  type        = string
-}
-
 variable "target_group_atlantis_arn" {
   description = "The target for atlantis traffic"
   type        = string

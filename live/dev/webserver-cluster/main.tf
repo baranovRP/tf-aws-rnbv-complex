@@ -67,7 +67,6 @@ module "asg" {
   key_name      = aws_key_pair.deployer.key_name
   user_data     = data.template_file.user_data.rendered
 
-  target_group_web_arn      = module.alb.target_group_web_arn
   target_group_atlantis_arn = module.alb.target_group_atlantis_arn
 }
 

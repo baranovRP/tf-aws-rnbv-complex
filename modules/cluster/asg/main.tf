@@ -39,7 +39,7 @@ resource "aws_autoscaling_group" "this" {
   launch_configuration = aws_launch_configuration.this.id
   vpc_zone_identifier  = data.aws_subnet_ids.default.ids
 
-  target_group_arns = [var.target_group_web_arn, var.target_group_atlantis_arn]
+  target_group_arns = [var.target_group_atlantis_arn]
   health_check_type = "ELB"
 
   min_size = var.min_size
