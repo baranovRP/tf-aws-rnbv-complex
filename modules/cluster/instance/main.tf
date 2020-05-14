@@ -62,10 +62,32 @@ resource "aws_instance" "this" {
   }
 }
 
+
 resource "aws_security_group" "web_dmz" {
   name = "tf-web-dmz"
 }
 
+resource "aws_security_group_rule" "allow_all_instance" {
+  type              = "ingress"
+  security_group_id = aws_security_group.web_dmz.id
+
+  from_port   = 0
+  to_port     = 0
+  protocol    = -1
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "allow_all_outbound_instance" {
+  type              = "egress"
+  security_group_id = aws_security_group.web_dmz.id
+
+  from_port   = 0
+  to_port     = 0
+  protocol    = -1
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+/*
 resource "aws_security_group_rule" "allow_ssh_instance" {
   type              = "ingress"
   security_group_id = aws_security_group.web_dmz.id
@@ -86,12 +108,4 @@ resource "aws_security_group_rule" "allow_atlantis_instance" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "allow_all_outbound_instance" {
-  type              = "egress"
-  security_group_id = aws_security_group.web_dmz.id
-
-  from_port   = 0
-  to_port     = 0
-  protocol    = -1
-  cidr_blocks = ["0.0.0.0/0"]
-}
+*/
