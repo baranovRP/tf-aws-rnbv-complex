@@ -81,9 +81,9 @@ resource "aws_lb_target_group" "atlantis" {
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 60
-    timeout             = 15
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
+    timeout             = 59
+    healthy_threshold   = 5
+    unhealthy_threshold = 5
   }
 }
 

@@ -13,15 +13,15 @@ wget -O ~/downloads/terraform.zip https://releases.hashicorp.com/terraform/0.12.
 wget -O ~/downloads/atlantis.zip https://github.com/runatlantis/atlantis/releases/download/v0.12.0/atlantis_linux_386.zip
 sudo unzip -o ~/downloads/terraform.zip -d /usr/local/bin/
 sudo unzip -o ~/downloads/atlantis.zip -d /usr/local/bin/
-rm -rf ~/downloads/
+sudo rm -rf ~/downloads/
 
 export AWS_PROFILE=ora2postgres
 export URL_ALB=${alb_dns_name}/events
 export URL=$URL_ALB
-export USERNAME=$(aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .username)
-export TOKEN=$(aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .token)
-export SECRET=$(aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .webhook_secret)
-export REPO_WHITELIST=github.com/baranovRP/$(aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .repo)
+export USERNAME=$(sudo aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .username)
+export TOKEN=$(sudo aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .token)
+export SECRET=$(sudo aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .webhook_secret)
+export REPO_WHITELIST=github.com/baranovRP/$(sudo aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .repo)
 
 echo "{
   \"name\": \"web\",
