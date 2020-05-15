@@ -2,8 +2,6 @@
 provider "aws" {
   version                 = "~> 2.0"
   region                  = "eu-west-2"
-  shared_credentials_file = "~/.aws/credentials"
-  profile                 = "ora2postgres"
 }
 
 terraform {
@@ -48,8 +46,8 @@ data "template_file" "user_data" {
   }
 }
 
-data "aws_iam_instance_profile" "ora2postgres" {
-  name = "ora2postgres_ASM_to_EC2"
+data "aws_iam_instance_profile" "ora2postgres_atlantis" {
+  name = "ora2postgres_atlantis"
 }
 
 resource "aws_key_pair" "deployer" {
@@ -70,7 +68,7 @@ module "asg" {
   instance_type        = local.instance_type
   key_name             = aws_key_pair.deployer.key_name
   user_data            = data.template_file.user_data.rendered
-  iam_instance_profile = data.aws_iam_instance_profile.ora2postgres.name
+  iam_instance_profile = data.aws_iam_instance_profile.ora2postgres_atlantis.name
 
   target_group_atlantis_arn = module.alb.target_group_atlantis_arn
 }
