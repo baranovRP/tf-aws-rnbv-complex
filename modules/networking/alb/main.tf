@@ -19,16 +19,16 @@ data "terraform_remote_state" "db" {
 }
 */
 
-resource "aws_lb" "tf_balancer" {
+resource "aws_lb" "this" {
   name = "${var.cluster_name}-alb"
 
   load_balancer_type = "application"
   subnets            = data.aws_subnet_ids.default.ids
-  security_groups    = [aws_security_group.in_out_all.id]
+  security_groups    = [aws_security_group.atlantis.id]
 }
 
 resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.tf_balancer.arn
+  load_balancer_arn = aws_lb.this.arn
   port              = 80
   protocol          = "HTTP"
 
@@ -43,64 +43,30 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-resource "aws_security_group" "in_out_all" {
+resource "aws_security_group" "atlantis" {
   name = "${var.cluster_name}-alb"
 }
 
-resource "aws_security_group_rule" "allow_http_inbound" {
+resource "aws_security_group_rule" "allow_atlantis_in" {
   type              = "ingress"
-  security_group_id = aws_security_group.in_out_all.id
+  security_group_id = aws_security_group.atlantis.id
 
-  from_port        = 0
-  to_port          = 0
-  protocol         = -1
+  from_port        = 80
+  to_port          = 4141
+  protocol         = "TCP"
   cidr_blocks      = ["0.0.0.0/0"]
   ipv6_cidr_blocks = ["::/0"]
 }
 
-resource "aws_security_group_rule" "allow_all_outbound" {
+resource "aws_security_group_rule" "allow_all_out" {
   type              = "egress"
-  security_group_id = aws_security_group.in_out_all.id
+  security_group_id = aws_security_group.atlantis.id
 
   from_port        = 0
   to_port          = 0
   protocol         = -1
   cidr_blocks      = ["0.0.0.0/0"]
   ipv6_cidr_blocks = ["::/0"]
-}
-
-resource "aws_lb_target_group" "web" {
-  name = "${var.cluster_name}-web"
-
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.default.id
-
-  health_check {
-    path                = "/"
-    protocol            = "HTTP"
-    matcher             = "200"
-    interval            = 15
-    timeout             = 3
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-}
-
-resource "aws_lb_listener_rule" "web" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 100
-
-  condition {
-    path_pattern {
-      values = ["*"]
-    }
-  }
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.web.arn
-  }
 }
 
 resource "aws_lb_target_group" "atlantis" {
@@ -111,19 +77,19 @@ resource "aws_lb_target_group" "atlantis" {
   vpc_id   = data.aws_vpc.default.id
 
   health_check {
-    path                = "/"
+    path                = "/healthz"
     protocol            = "HTTP"
     matcher             = "200"
-    interval            = 15
-    timeout             = 3
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
+    interval            = 60
+    timeout             = 59
+    healthy_threshold   = 5
+    unhealthy_threshold = 5
   }
 }
 
 resource "aws_lb_listener_rule" "atlantis" {
   listener_arn = aws_lb_listener.http.arn
-  priority     = 99
+  priority     = 100
 
   condition {
     path_pattern {

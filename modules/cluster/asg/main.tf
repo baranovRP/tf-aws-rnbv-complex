@@ -19,24 +19,29 @@ data "terraform_remote_state" "db" {
 }
 */
 
-resource "aws_launch_configuration" "tf_ami" {
-  image_id        = var.image_id
-  instance_type   = var.instance_type
-  security_groups = [aws_security_group.this.id]
-  key_name        = var.key_name
-
-  user_data = var.user_data
+resource "aws_launch_configuration" "this" {
+  image_id      = var.image_id
+  instance_type = var.instance_type
+  security_groups = [
+    aws_security_group.all.id,
+    aws_security_group.atlantis.id,
+    aws_security_group.web.id,
+    aws_security_group.ssh.id
+  ]
+  key_name             = var.key_name
+  user_data            = var.user_data
+  iam_instance_profile = var.iam_instance_profile
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "aws_autoscaling_group" "web_cluster" {
-  launch_configuration = aws_launch_configuration.tf_ami.id
+resource "aws_autoscaling_group" "this" {
+  launch_configuration = aws_launch_configuration.this.id
   vpc_zone_identifier  = data.aws_subnet_ids.default.ids
 
-  target_group_arns = [var.target_group_web_arn, var.target_group_atlantis_arn]
+  target_group_arns = [var.target_group_atlantis_arn]
   health_check_type = "ELB"
 
   min_size = var.min_size
@@ -49,35 +54,55 @@ resource "aws_autoscaling_group" "web_cluster" {
   }
 }
 
-resource "aws_security_group" "this" {
-  name = "${var.cluster_name}-atlantis"
+resource "aws_security_group" "ssh" {
+  name = "${var.cluster_name}-ssh"
 }
 
-/*
-resource "aws_security_group_rule" "allow_ssh_instance" {
+resource "aws_security_group_rule" "allow_ssh" {
   type              = "ingress"
-  security_group_id = aws_security_group.this.id
+  security_group_id = aws_security_group.ssh.id
 
   from_port   = 22
   to_port     = 22
-  protocol    = local.protocols.tcp
-  cidr_blocks = [local.cidrblocks.cidrblock_all_ipv4]
+  protocol    = "TCP"
+  cidr_blocks = ["0.0.0.0/0"]
 }
-*/
-resource "aws_security_group_rule" "allow_http_inbound_instance" {
+
+resource "aws_security_group" "web" {
+  name = "${var.cluster_name}-web"
+}
+
+resource "aws_security_group_rule" "allow_web" {
   type              = "ingress"
-  security_group_id = aws_security_group.this.id
+  security_group_id = aws_security_group.web.id
 
-  from_port        = 0
-  to_port          = 0
-  protocol         = -1
-  cidr_blocks      = ["0.0.0.0/0"]
-  ipv6_cidr_blocks = ["::/0"]
+  from_port   = 80
+  to_port     = 80
+  protocol    = "TCP"
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "allow_all_outbound_instance" {
+resource "aws_security_group" "atlantis" {
+  name = "${var.cluster_name}-atlantis"
+}
+
+resource "aws_security_group_rule" "allow_atlantis" {
+  type              = "ingress"
+  security_group_id = aws_security_group.atlantis.id
+
+  from_port   = 4141
+  to_port     = 4141
+  protocol    = "TCP"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group" "all" {
+  name = "${var.cluster_name}-out"
+}
+
+resource "aws_security_group_rule" "allow_all_out" {
   type              = "egress"
-  security_group_id = aws_security_group.this.id
+  security_group_id = aws_security_group.all.id
 
   from_port        = 0
   to_port          = 0
@@ -85,4 +110,3 @@ resource "aws_security_group_rule" "allow_all_outbound_instance" {
   cidr_blocks      = ["0.0.0.0/0"]
   ipv6_cidr_blocks = ["::/0"]
 }
-

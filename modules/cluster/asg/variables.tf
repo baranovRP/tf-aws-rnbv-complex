@@ -41,11 +41,6 @@ variable "image_id" {
   default     = ""
 }
 
-variable "target_group_web_arn" {
-  description = "The target for web traffic"
-  type        = string
-}
-
 variable "target_group_atlantis_arn" {
   description = "The target for atlantis traffic"
   type        = string
@@ -53,5 +48,10 @@ variable "target_group_atlantis_arn" {
 
 variable "key_name" {
   description = "The name of a key pair"
+  type        = string
+}
+
+variable "iam_instance_profile" {
+  description = "The security instance profile"
   type        = string
 }
