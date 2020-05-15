@@ -27,8 +27,9 @@ resource "aws_launch_configuration" "this" {
     aws_security_group.atlantis.id,
     aws_security_group.ssh.id
   ]
-  key_name  = var.key_name
-  user_data = var.user_data
+  key_name             = var.key_name
+  user_data            = var.user_data
+  iam_instance_profile = var.iam_instance_profile
 
   lifecycle {
     create_before_destroy = true

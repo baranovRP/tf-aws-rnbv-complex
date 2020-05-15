@@ -50,3 +50,8 @@ variable "key_name" {
   description = "The name of a key pair"
   type        = string
 }
+
+variable "iam_instance_profile" {
+  description = "The security instance profile"
+  type        = string
+}
