@@ -1,12 +1,7 @@
 #!/bin/bash
 sudo yum -y update
 sudo yum -y install git
-sudo yum -y install httpd
 sudo yum -y install jq
-myip=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
-echo "<h2>WebServer with private IP: $myip</h2><p>Build by Terraform using External Script!!!" > /var/www/html/index.html
-sudo service httpd start
-chkconfig httpd on
 
 mkdir ~/downloads
 wget -O ~/downloads/terraform.zip https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
