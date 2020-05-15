@@ -76,15 +76,15 @@ resource "aws_lb_target_group" "atlantis" {
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
 
-/*  health_check {
-    path                = "/"
+  health_check {
+    path                = "/healthz"
     protocol            = "HTTP"
     matcher             = "200"
-    interval            = 15
-    timeout             = 3
+    interval            = 60
+    timeout             = 15
     healthy_threshold   = 2
     unhealthy_threshold = 2
-  }*/
+  }
 }
 
 resource "aws_lb_listener_rule" "atlantis" {
