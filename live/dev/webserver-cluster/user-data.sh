@@ -15,9 +15,7 @@ sudo unzip -o ~/downloads/terraform.zip -d /usr/local/bin/
 sudo unzip -o ~/downloads/atlantis.zip -d /usr/local/bin/
 sudo rm -rf ~/downloads/
 
-export AWS_PROFILE=ora2postgres
-export URL_ALB=${alb_dns_name}/events
-export URL=$URL_ALB
+export URL="http://${alb_dns_name}/events"
 export USERNAME=$(sudo aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .username)
 export TOKEN=$(sudo aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .token)
 export SECRET=$(sudo aws secretsmanager get-secret-value --secret-id dev/atlantis/github --region eu-west-2 | jq -r .SecretString | jq -r .webhook_secret)
@@ -36,7 +34,7 @@ echo "{
     \"content_type\": \"json\",
     \"insecure_ssl\": \"0\",
     \"secret\": \"$SECRET\",
-    \"url\": \"http://$URL\"
+    \"url\": \"$URL\"
   }
 }"  > data.json
 
@@ -50,8 +48,8 @@ sudo yum -y clean all
 sudo rm -rf /var/cache/yum
 
 atlantis server \
---atlantis-url="http://$URL" \
+--atlantis-url="$URL" \
 --gh-user="$USERNAME" \
 --gh-token="$TOKEN" \
 --gh-webhook-secret="$SECRET" \
---repo-whitelist="$REPO_WHITELIST" &
+--repo-whitelist="$REPO_WHITELIST" &> /tmp/atlantis-server.log &
