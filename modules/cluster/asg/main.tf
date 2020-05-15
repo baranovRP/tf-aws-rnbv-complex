@@ -23,9 +23,8 @@ resource "aws_launch_configuration" "this" {
   image_id      = var.image_id
   instance_type = var.instance_type
   security_groups = [
-    aws_security_group.all.id,
+    aws_security_group.world.id,
     aws_security_group.atlantis.id,
-    aws_security_group.web.id,
     aws_security_group.ssh.id
   ]
   key_name             = var.key_name
@@ -68,20 +67,6 @@ resource "aws_security_group_rule" "allow_ssh" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group" "web" {
-  name = "${var.cluster_name}-web"
-}
-
-resource "aws_security_group_rule" "allow_web" {
-  type              = "ingress"
-  security_group_id = aws_security_group.web.id
-
-  from_port   = 80
-  to_port     = 80
-  protocol    = "TCP"
-  cidr_blocks = ["0.0.0.0/0"]
-}
-
 resource "aws_security_group" "atlantis" {
   name = "${var.cluster_name}-atlantis"
 }
@@ -96,13 +81,13 @@ resource "aws_security_group_rule" "allow_atlantis" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group" "all" {
+resource "aws_security_group" "world" {
   name = "${var.cluster_name}-out"
 }
 
 resource "aws_security_group_rule" "allow_all_out" {
   type              = "egress"
-  security_group_id = aws_security_group.all.id
+  security_group_id = aws_security_group.world.id
 
   from_port        = 0
   to_port          = 0
