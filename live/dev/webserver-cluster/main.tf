@@ -80,3 +80,5 @@ module "alb" {
   db_remote_state_bucket = "tf-state-eu-west-2-rnbv"
   db_remote_state_key    = "dev/services/webserver-cluster/terraform.tfstate"
 }
+
+resource "null_resource" "demo" {}
