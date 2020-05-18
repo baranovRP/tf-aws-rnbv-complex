@@ -23,7 +23,8 @@ resource "aws_launch_configuration" "this" {
   security_groups = [
     aws_security_group.world.id,
     aws_security_group.atlantis.id,
-    aws_security_group.ssh.id
+    aws_security_group.ssh.id,
+    aws_security_group.web.id
   ]
   key_name             = var.key_name
   user_data            = var.user_data
@@ -61,6 +62,20 @@ resource "aws_security_group_rule" "allow_ssh" {
 
   from_port   = 22
   to_port     = 22
+  protocol    = "TCP"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group" "web" {
+  name = "${var.cluster_name}-web"
+}
+
+resource "aws_security_group_rule" "allow_web" {
+  type              = "ingress"
+  security_group_id = aws_security_group.web.id
+
+  from_port   = 80
+  to_port     = 80
   protocol    = "TCP"
   cidr_blocks = ["0.0.0.0/0"]
 }
