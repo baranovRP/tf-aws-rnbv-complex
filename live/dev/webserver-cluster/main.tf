@@ -88,3 +88,33 @@ module "alb" {
 
   webhook_url = "http://${module.alb.alb_dns_name}/events"
 }*/
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"]
+}
+
+resource "aws_instance" "secondserver" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "updated by atlantis"
+  }
+  subnet_id = data.aws_subnet.default.id
+}
+
+data "aws_subnet" "default" {
+  availability_zone = "eu-west-2a"
+}
