@@ -42,7 +42,7 @@ data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
 
   vars = {
-    url            = local.alb_dns_name
+    url            = local.atlantis_url
     webhook_secret = local.webhook_secret
     username       = local.github_username
     token          = local.github_token
@@ -59,7 +59,7 @@ resource "aws_key_pair" "deployer" {
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCfObcpiUJAYEGXnJ0FOcyTM6pFvs1tTFKhpuNWfE/sssk7oGnM2Kw3zdktg7Ykq/LV+tOlxl9VtBa9FN6BQmxMi/bW96c47rGYL8VMPCQ3e7Qa7mKjbx1coBcQg9gxaLpWA73oD41O2cHYit084SlS8BTiRl1f4Lc9nPKM9RKyOzC6zajyIBFLDjOcRgVkEVoEW8QYroAFLJwKuKqu9oI9HAuov0c1o99J4ASqKmC/rm/76d1Fhs83dXNhLldmme7aN7M7XKX+8NM7hPeJtG3LGuxOtVMmMOhPkqG7FbtFWhKuXvD5CdU/S7QkxGo3lkZE+cwrUqKWQmEB6t4lKkxB"
 }
 
-resource "null_resource" "demo" {}
+//resource "null_resource" "demo" {}
 
 module "asg" {
   source = "../../../modules/cluster/asg"
@@ -96,15 +96,17 @@ module "security" {
 // future github integration
 /*
 module "github" {
-  source = "../../../modules/common"
+  source = "../../../modules/common/github"
 
-  webhook_url = "http://${module.alb.alb_dns_name}/events"
+  webhook_url = local.atlantis_url
+  webhook_secret = local.webhook_secret
+  github_token = local.github_token
+  atlantis_allowed_repo_names = [local.github_repo_url]
 }
 */
 
 // for demo purpose
-/*
-data "aws_ami" "ubuntu" {
+/*data "aws_ami" "ubuntu" {
   most_recent = true
 
   filter {
@@ -132,5 +134,4 @@ resource "aws_instance" "secondserver" {
     Name = "updated by atlantis"
   }
   subnet_id = data.aws_subnet.default.id
-}
-*/
+}*/
