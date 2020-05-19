@@ -1,5 +1,5 @@
 ###
-output "webhook_sectret" {
+output "webhook_secret" {
   description = "The generated webhook's secret string"
   value       = random_id.webhook.hex
 }
